@@ -1,0 +1,27 @@
+CREATE DATABASE messagingapp;
+
+CREATE TABLE Users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password_hash TEXT NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE Chats (
+    id SERIAL PRIMARY KEY,
+    chat_name VARCHAR(255)
+);
+
+CREATE TABLE Groups (
+    user_id INT NOT NULL REFERNCES Users(id) ON DELETE CASCADE,
+    chat_id INT NOT NULL REFERNCES Chats(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, chat_id)
+);
+
+CREATE TABLE Messages (
+    id SERIAL PRIMARY KEY,
+    recipient_id INT NOT NULL REFERNCES Groups(id) ON DELETE CASCADE,
+    sender_id INT NOT NULL REFERNCES Users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
