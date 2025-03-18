@@ -13,3 +13,11 @@ Once the virtual environment is activated, you should see `(venv)` in your termi
 `pip install -r requirements.txt`
 
 in the terminal and hitting enter. All needed libraries should be installed.
+
+
+**Server Usage**
+Use `python main.py` to start the server. It will start on 127.0.0.1:5000 by default.
+
+Use `python seed.py` to create the main.db file with the proper table.
+
+`testclient.py` is a showcase on how POST requests work. Running it while the server is online will insert a new user into main.db with the info sent through a POST request. I recommend an extension like `SQLite Viewer` to inspect the .db file easily (make sure to refresh it to see the latest changes).
