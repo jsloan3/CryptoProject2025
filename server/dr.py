@@ -30,7 +30,7 @@ def kdf_root(root_key: bytes, dh_output: bytes) -> tuple[bytes, bytes]:
 
 def kdf_chain(chain_key: bytes) -> tuple[bytes, bytes]:
     """
-    Implements the KDF chain step as defined in the Signal Double Ratchet specification.
+    Implements the KDF chain step for the recieving and sending chains as defined in the Signal Double Ratchet specification.
     Given a chain key (CK), derive:
       - The message key (MK) = HMAC_SHA256(CK, 0x01)
       - The next chain key (CK') = HMAC_SHA256(CK, 0x02)
