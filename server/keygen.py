@@ -1,6 +1,6 @@
 import sys
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.asymmetric import x25519
+from cryptography.hazmat.primitives.asymmetric import ed25519
 import os
 from pathlib import Path
 
@@ -25,7 +25,7 @@ def decrypt(encrypt_key: bytes, private_key_encrypted: bytes) -> bytes:
 def generate_keys(encrypt_private_key: bool = False) -> tuple[bytes, bytes]:
     "Generates an Ed25519 private key as well as an encryption key for storing it."
     encrypt_key = Fernet.generate_key()
-    private_key = x25519.X25519PrivateKey.generate().private_bytes_raw()
+    private_key = ed25519.Ed25519PrivateKey.generate().private_bytes_raw()
     if encrypt_private_key:
         private_key = encrypt(encrypt_key, private_key)
     return encrypt_key, private_key
@@ -55,7 +55,7 @@ def get_pubkey(private_key: bytes, encrypt_key: bytes | None = None) -> bytes:
     if encrypt_key is not None:
         private_key = decrypt(encrypt_key, private_key)
     return (
-        x25519.X25519PrivateKey.from_private_bytes(private_key)
+        ed25519.Ed25519PrivateKey.from_private_bytes(private_key)
         .public_key()
         .public_bytes_raw()
     )
@@ -69,7 +69,6 @@ def reset_keys() -> None:
 def main() -> None:
     encrypt_key, private_key = generate_keys()
     private_key_encrypted = encrypt(encrypt_key, private_key)
-
     print(
         f"{" Generating Keys ":=^100}",
         f"{encrypt_key = }",
