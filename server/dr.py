@@ -11,22 +11,24 @@ from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-def kdf_root(root_key: bytes, dh_output: bytes) -> tuple[bytes, bytes]:
+def derive_keys(shared_secret: bytes, dh_output: bytes) -> tuple[bytes, bytes]:
     """
-    Derives a new root key and chain key from the current root key and DH output.
-    Uses HKDF to derive 64 bytes and splits them into two 32-byte keys.
+    Derives two 32-byte keys from a shared secret and a DH output.
+    One key will serve as the sending chain key and the other as the receiving chain key.
     """
     hkdf = HKDF(
         algorithm=hashes.SHA256(),
         length=64,
-        salt=root_key,
-        info=b"DoubleRatchetRoot",
+        salt=shared_secret,
+        info=b"DoubleRatchetInitial",
         backend=default_backend(),
     )
     derived = hkdf.derive(dh_output)
-    new_root = derived[:32]
-    new_chain_key = derived[32:]
-    return new_root, new_chain_key
+    return derived[:32], derived[32:]
+
+
+kdf_root = derive_keys
+initial_key_derivation = derive_keys
 
 
 def kdf_chain(chain_key: bytes) -> tuple[bytes, bytes]:
@@ -133,24 +135,6 @@ class DoubleRatchet:
         aesgcm = AESGCM(message_key)
         plaintext = aesgcm.decrypt(message["nonce"], message["ciphertext"], None)
         return plaintext.decode()
-
-
-def initial_key_derivation(
-    shared_secret: bytes, dh_output: bytes
-) -> tuple[bytes, bytes]:
-    """
-    Derives two 32-byte keys from a shared secret and a DH output.
-    One key will serve as the sending chain key and the other as the receiving chain key.
-    """
-    hkdf = HKDF(
-        algorithm=hashes.SHA256(),
-        length=64,
-        salt=shared_secret,
-        info=b"DoubleRatchetInitial",
-        backend=default_backend(),
-    )
-    derived = hkdf.derive(dh_output)
-    return derived[:32], derived[32:]
 
 
 def main() -> None:
