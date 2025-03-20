@@ -81,6 +81,7 @@ class DoubleRatchet:
 
         # Set the new remote DH key.
         self.remote_dh_public = new_remote_dh_public
+        print(new_remote_dh_public)
         self.remote_dh_public_bytes = new_remote_dh_public.public_bytes(
             encoding=serialization.Encoding.Raw, format=serialization.PublicFormat.Raw
         )
