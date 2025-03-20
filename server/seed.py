@@ -1,18 +1,19 @@
 import sqlite3
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-def main():
-    conn = sqlite3.connect('main.db')
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA journal_mode=WAL;")
+engine = create_engine("sqlite:///main.db", echo=True)
+Base = declarative_base()
 
-    cursor.execute(""" 
-    CREATE TABLE IF NOT EXISTS USERS (
-        ID INTEGER PRIMARY KEY,
-        PhoneHash TEXT,
-        Name TEXT,
-        EdPublic TEXT
-    )
-    """)
+class User(Base):
+    __tablename__ = 'USERS'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    phonehash = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    edpublic = Column(String, nullable=False)
+
+def create_db():
+    Base.metadata.create_all(engine)
 
 if __name__ == "__main__":
-    main()
+    create_db()
