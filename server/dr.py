@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 import os
 import hmac
 import hashlib
@@ -42,25 +43,17 @@ def kdf_chain(chain_key: bytes) -> tuple[bytes, bytes]:
     return message_key, new_chain_key
 
 
+@dataclass
 class DoubleRatchet:
-    def __init__(
-        self,
-        root_key: bytes,
-        dh_pair: x25519.X25519PrivateKey,
-        remote_dh_public: x25519.X25519PublicKey,
-        sending_chain_key: bytes,
-        receiving_chain_key: bytes,
-    ):
-        self.root_key = root_key
-        self.dh_pair = dh_pair  # Our current DH key pair
-        self.remote_dh_public = remote_dh_public  # The other party's DH public key
-        self.sending_chain_key = sending_chain_key
-        self.receiving_chain_key = receiving_chain_key
-        self.Ns = 0  # Sending message counter
-        self.Nr = 0  # Receiving message counter
-        self.PN = 0  # Previous sending chain length (for handling skipped keys, not fully implemented)
-        # Flag to control when to include our new DH public key in a message header.
-        self.dh_ratchet_sent = True
+    root_key: bytes
+    dh_pair: x25519.X25519PrivateKey
+    remote_dh_public: x25519.X25519PublicKey
+    sending_chain_key: bytes
+    receiving_chain_key: bytes
+    Nr: int = field(init=False, default=0)
+    PN: int = field(init=False, default=0)
+    Ns: int = field(init=False, default=0)
+    dh_ratchet_sent: int = field(init=False, default=True)
 
     @property
     def remote_dh_public_bytes(self) -> bytes:
@@ -160,7 +153,7 @@ def initial_key_derivation(
     return derived[:32], derived[32:]
 
 
-if __name__ == "__main__":
+def main() -> None:
     # === Initial Setup ===
     # Both parties (Alice and Bob) start with a shared secret (from a pre-key or other key agreement)
     shared_secret = os.urandom(32)
@@ -222,3 +215,7 @@ if __name__ == "__main__":
     # When Bob decrypts msg3, he detects the new DH public key and performs a DH ratchet update.
     plaintext3 = bob_ratchet.decrypt_message(msg3)
     print("Bob receives:", pformat(plaintext3))
+
+
+if __name__ == "__main__":
+    main()
