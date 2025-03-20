@@ -31,6 +31,12 @@ class Message(Base):
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
+class Pubkey(Base):
+    __tablename__ = 'PUBKEYS'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    owner = Column(String, nullable=False)
+    keycontent = Column(String)
+
 def create_db():
     Base.metadata.create_all(engine)
 
