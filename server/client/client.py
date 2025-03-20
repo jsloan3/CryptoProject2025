@@ -70,10 +70,10 @@ class Client:
         return resp["shared_key"]
     
     def find_priv_from_id(self, id):
-        print(f"DH KEYS: {self.dh_keys}")
+        #print(f"DH KEYS: {self.dh_keys}")
         for d in self.dh_keys:
             if d["key_id"] == id:
-                print(f"found KEY!!!: {d["key_id"]}")
+                #print(f"found KEY!!!: {d["key_id"]}")
                 return d["privkey"]
         return None
     
@@ -97,7 +97,7 @@ class Client:
         
         data = json.dumps(to_send, default=self.cust_serializer)
         data = json.loads(data)
-        print(data)
+        #print(data)
         resp = requests.post(f"{HOSTNAME}/send_message", json=data)
 
     
@@ -112,7 +112,6 @@ class Client:
         return res.json()
     
     def decode_first_message(self, message):
-        print(f"yapdollar!!!!: {message}")
         message = self.json_to_dr_format(message)
         message = self.recursive_json(message)
         shared_key = bytes.fromhex(self.get_shared_key())
@@ -181,10 +180,8 @@ def main():
     alice = Client("alice", "3213213210")
 
     bob.add_pub_key_serv(bob.make_keys())
-    alice.send_first_message('1231231234', 'sauce')
-
+    alice.send_first_message('1231231234', 'this is a message from alice')
     x = bob.get_oldest_msg_from_num('3213213210')
-
     bob.decode_first_message(x)
 
 if __name__ == '__main__':

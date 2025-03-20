@@ -96,9 +96,12 @@ def get_oldest_msg_from_num():
     bundle = request.json
     requester = bundle["requester"]
     target = bundle["target"]
+    i = 0
     for m in messages:
         if m["recipient"] == requester and m["sender"] == target:
-            return jsonify(m), 200
+            x = messages.pop(i)
+            return jsonify(x), 200
+        i += 1
     return "could not find number", 400
 
 ## TODO: make actual key sharing, this is a debug method
