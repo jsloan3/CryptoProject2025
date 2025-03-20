@@ -1,10 +1,10 @@
 import os
 import hmac
 import hashlib
-from pprint import pprint, pformat
+from pprint import pformat
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -54,9 +54,6 @@ class DoubleRatchet:
         self.root_key = root_key
         self.dh_pair = dh_pair  # Our current DH key pair
         self.remote_dh_public = remote_dh_public  # The other party's DH public key
-        self.remote_dh_public_bytes = remote_dh_public.public_bytes(
-            encoding=serialization.Encoding.Raw, format=serialization.PublicFormat.Raw
-        )
         self.sending_chain_key = sending_chain_key
         self.receiving_chain_key = receiving_chain_key
         self.Ns = 0  # Sending message counter
@@ -64,6 +61,10 @@ class DoubleRatchet:
         self.PN = 0  # Previous sending chain length (for handling skipped keys, not fully implemented)
         # Flag to control when to include our new DH public key in a message header.
         self.dh_ratchet_sent = True
+
+    @property
+    def remote_dh_public_bytes(self) -> bytes:
+        return self.remote_dh_public.public_bytes_raw()
 
     def dh_ratchet_update(self, new_remote_dh_public: x25519.X25519PublicKey):
         """
@@ -78,12 +79,7 @@ class DoubleRatchet:
         # Update root and receiving chain with our current DH key and the new remote key.
         dh_output = self.dh_pair.exchange(new_remote_dh_public)
         self.root_key, self.receiving_chain_key = kdf_root(self.root_key, dh_output)
-
-        # Set the new remote DH key.
-        self.remote_dh_public = new_remote_dh_public
-        self.remote_dh_public_bytes = new_remote_dh_public.public_bytes(
-            encoding=serialization.Encoding.Raw, format=serialization.PublicFormat.Raw
-        )
+        self.remote_dh_public = new_remote_dh_public  # Set the new remote DH key.
 
         # Generate a new DH key pair for our side.
         self.dh_pair = x25519.X25519PrivateKey.generate()
@@ -100,13 +96,10 @@ class DoubleRatchet:
         Encrypts a plaintext message.
         When a DH ratchet update has just occurred, includes our new DH public key in the header.
         """
-        self.dh_ratchet_sent = False # Change made
+        self.dh_ratchet_sent = False  # Change made
 
         if not self.dh_ratchet_sent:
-            dh_bytes = self.dh_pair.public_key().public_bytes(
-                encoding=serialization.Encoding.Raw,
-                format=serialization.PublicFormat.Raw,
-            )
+            dh_bytes = self.dh_pair.public_key().public_bytes_raw()
             header = {"dh": dh_bytes, "pn": self.PN, "n": self.Ns}
             self.dh_ratchet_sent = True
         else:
