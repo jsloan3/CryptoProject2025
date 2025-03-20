@@ -3,7 +3,7 @@ import os
 import json
 import keygen
 
-HOSTNAME = "http://127.0.0.1:5000/register"
+HOSTNAME = "http://127.0.0.1:5000"
 os.putenv("RATCHAT_KEY_PATH", os.path.abspath("./keys"))
 
 def main():
@@ -13,6 +13,8 @@ def main():
     with open("userdata.json", "r") as file:
         userdata = json.load(file)
 
+    #print(name_from_phone("123456789"))
+
 
 def make_user(phone, name, edpublic):
     to_send = {
@@ -20,10 +22,16 @@ def make_user(phone, name, edpublic):
         "Name": name,
         "EdPublic": edpublic
     }
-    server_response = requests.post(HOSTNAME, json=to_send)
+    server_response = requests.post(HOSTNAME + "/register", json=to_send)
 
     return server_response.ok
 
+def name_from_phone(phone):
+    to_send = {"phone": phone}
+    server_response = requests.post(HOSTNAME + "/user_from_phone", json=to_send)
+    if server_response.ok:
+        return server_response.content.decode()
+    return None
 
 def register():
     errormsg = "There was an error creating your account. Please try later. Exiting."
