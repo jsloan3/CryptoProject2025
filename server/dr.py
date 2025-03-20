@@ -100,6 +100,8 @@ class DoubleRatchet:
         Encrypts a plaintext message.
         When a DH ratchet update has just occurred, includes our new DH public key in the header.
         """
+        self.dh_ratchet_sent = False # Change made
+
         if not self.dh_ratchet_sent:
             dh_bytes = self.dh_pair.public_key().public_bytes(
                 encoding=serialization.Encoding.Raw,
