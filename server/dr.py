@@ -27,18 +27,16 @@ def derive_keys(shared_secret: bytes, dh_output: bytes) -> tuple[bytes, bytes]:
     return derived[:32], derived[32:]
 
 
-kdf_root = derive_keys
-initial_key_derivation = derive_keys
-
-
 def kdf_chain(chain_key: bytes) -> tuple[bytes, bytes]:
-    """
-    Implements the KDF chain step for the recieving and sending chains as defined in the Signal Double Ratchet specification.
+    """Implements the KDF chain step for the recieving and sending chains as defined
+    in the Signal Double Ratchet specification.
+
     Given a chain key (CK), derive:
       - The message key (MK) = HMAC_SHA256(CK, 0x01)
       - The next chain key (CK') = HMAC_SHA256(CK, 0x02)
 
-    Reference: https://signal.org/docs/specifications/doubleratchet/#kdf-chains :contentReference[oaicite:1]{index=1}
+    References:
+        - https://signal.org/docs/specifications/doubleratchet/#kdf-chains
     """
     message_key = hmac.new(chain_key, b"\x01", hashlib.sha256).digest()
     new_chain_key = hmac.new(chain_key, b"\x02", hashlib.sha256).digest()
@@ -67,13 +65,11 @@ class DoubleRatchet:
         This updates the root key, receiving chain, and then creates a new DH key pair
         to update the sending chain.
         """
-        self.PN = self.Ns
-        self.Ns = 0
-        self.Nr = 0
+        self.PN, self.Ns, self.Nr = self.Ns, 0, 0
 
         # Update root and receiving chain with our current DH key and the new remote key.
         dh_output = self.dh_pair.exchange(new_remote_dh_public)
-        self.root_key, self.receiving_chain_key = kdf_root(self.root_key, dh_output)
+        self.root_key, self.receiving_chain_key = derive_keys(self.root_key, dh_output)
         self.remote_dh_public = new_remote_dh_public  # Set the new remote DH key.
 
         # Generate a new DH key pair for our side.
@@ -81,7 +77,7 @@ class DoubleRatchet:
 
         # Update root and sending chain with our new DH key and the new remote key.
         dh_output = self.dh_pair.exchange(self.remote_dh_public)
-        self.root_key, self.sending_chain_key = kdf_root(self.root_key, dh_output)
+        self.root_key, self.sending_chain_key = derive_keys(self.root_key, dh_output)
 
         # Mark that we need to include our new DH public key in the next message.
         self.dh_ratchet_sent = False
@@ -93,12 +89,12 @@ class DoubleRatchet:
         """
         self.dh_ratchet_sent = False  # Change made
 
-        if not self.dh_ratchet_sent:
+        if self.dh_ratchet_sent:
+            header = {"dh": None, "pn": None, "n": self.Ns}
+        else:
             dh_bytes = self.dh_pair.public_key().public_bytes_raw()
             header = {"dh": dh_bytes, "pn": self.PN, "n": self.Ns}
             self.dh_ratchet_sent = True
-        else:
-            header = {"dh": None, "pn": None, "n": self.Ns}
 
         # Derive the message key and update the sending chain key.
         message_key, self.sending_chain_key = kdf_chain(self.sending_chain_key)
@@ -153,8 +149,8 @@ def main() -> None:
     dh_output = alice_dh.exchange(bob_pub)
 
     # Derive initial chain keys. For simplicity, one party’s sending key is the other’s receiving key.
-    alice_send, alice_recv = initial_key_derivation(shared_secret, dh_output)
-    bob_recv, bob_send = initial_key_derivation(shared_secret, dh_output)
+    alice_send, alice_recv = derive_keys(shared_secret, dh_output)
+    bob_recv, bob_send = derive_keys(shared_secret, dh_output)
 
     # Initialize the Double Ratchet instances for both parties.
     alice_ratchet = DoubleRatchet(
