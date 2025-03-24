@@ -150,7 +150,7 @@ class Client:
     def make_ratchet_as_sender(self, shared_key: bytes, our_private_key: x25519.X25519PrivateKey, 
                                their_public: x25519.X25519PublicKey):
         our_exchange = our_private_key.exchange(their_public)
-        our_send, our_recv = dr.initial_key_derivation(shared_key, our_exchange)
+        our_send, our_recv = dr.derive_keys(shared_key, our_exchange)
 
         our_ratchet = dr.DoubleRatchet(
             root_key = shared_key,
@@ -163,7 +163,7 @@ class Client:
 
     def make_ratchet_as_reciever(self, shared_key: bytes, our_private_key: x25519.X25519PrivateKey, 
                                their_public: x25519.X25519PublicKey, their_dh: bytes):
-        our_recv, our_send = dr.initial_key_derivation(shared_key, their_dh)
+        our_recv, our_send = dr.derive_keys(shared_key, their_dh)
 
         our_ratchet = dr.DoubleRatchet(
             root_key = shared_key,
