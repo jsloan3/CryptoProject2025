@@ -1,10 +1,32 @@
+import datetime
 import json
 import requests, time, sys
+from flask import Flask, redirect, render_template, request
 
 SERVER_HOST = 'http://127.0.0.1:8000'
 USER_DATA_FILE = 'user_data.json'
 MESSAGE_STORAGE = 'message_storage.json'
 my_phonenum = None
+
+app = Flask(__name__)
+
+@app.route('/messages/<phonenum>', methods=['GET'])
+def messages(phonenum):
+    check_messages(my_phonenum)
+    messages = get_phone_messages(phonenum)
+    return render_template('messages.jinja', messages=messages, recipient=phonenum)
+
+@app.route('/sendmessage', methods=['POST'])
+def sendmessage():
+    data = request.get_json()
+    message = data['message']
+    send_to = data['recipient']
+    send_message(send_to, message)
+
+    return redirect(f'/messages/{send_to}')
+
+
+
 
 
 def check_messages(phonenum):
@@ -18,21 +40,28 @@ def check_messages(phonenum):
             for m in messages:
                 print(f"From {m['sender']} ({m['timestamp']}): {m['message']}")
             print("-------------------")
+            save_messages(messages)
             return messages
 
     except:
         print("Error retriving messages occured.")
 
 def send_message(phonenum, message):
+    timestamp = datetime.datetime.now().isoformat()
     to_send = {
         'sender': my_phonenum,
         'recipient': phonenum,
-        'message': message
+        'message': message,
+        'timestamp': timestamp,
+        'own_message': False,
     }
     try:
         res = requests.post(f"{SERVER_HOST}/send", json=to_send)
-    except:
-        print("An error occured while sending the message.")
+        if not res.ok:
+            raise Exception
+        save_own_message(to_send)
+    except Exception as e:
+        print(f"An error occured while sending the message: {e}")
 
 def main():
     global my_phonenum
@@ -44,7 +73,6 @@ def main():
         match choice:
             case 'c':
                 messages = check_messages(my_phonenum)
-                save_messages(messages)
             case 's':
                 dest = input("What # to send to?: ")
                 mes = input("Message: ")
@@ -52,6 +80,9 @@ def main():
             case 'q':
                 print("Goodbye. Exiting.")
                 exit()
+            case 'p':
+                num = input("What phone# to scan for?: ")
+                print(get_phone_messages(num))
             case _:
                 print("Invalid choice. Try again.")
 
@@ -87,7 +118,6 @@ def load_saved_messages():
         with open(MESSAGE_STORAGE, 'r') as f:
             return json.load(f)
     except:
-        print("An exception occured while loading saved messages.")
         return []
 
 def save_messages(new_messages):
@@ -103,6 +133,30 @@ def save_messages(new_messages):
     except:
         print(f"An error occured while saving messages to file.")
 
+def save_own_message(new_message):
+    if not new_message:
+        return False
+    to_save = {
+        'sender': new_message['recipient'],
+        'recipient': new_message['sender'],
+        'message': new_message['message'],
+        'timestamp': new_message['timestamp'],
+        'own_message': True
+    }
+    save_messages([to_save])
+
+def get_phone_messages(phonenum):
+    messages = load_saved_messages()
+    if not messages:
+        return []
+    to_return = []
+    for m in messages:
+        if m['sender'] == phonenum:
+            to_return += [m]
+    return to_return
+    
+
 
 if __name__ == "__main__":
-    main()
+    app.run(host = '0.0.0.0', port=8050, debug=True, threaded=False)
+    #main()

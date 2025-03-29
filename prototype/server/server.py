@@ -15,12 +15,14 @@ def send_message():
     sender = data['sender']
     recipient = data['recipient']
     message = data['message']
-    timestamp = datetime.datetime.now().isoformat()
+    timestamp = data['timestamp']
 
     message_data = {
         'sender': sender,
+        'recipient': recipient,
         'message': message,
-        'timestamp': timestamp
+        'timestamp': timestamp,
+        'own_message': False
     }
 
     message_queue[recipient].append(message_data)

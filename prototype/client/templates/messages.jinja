@@ -1,0 +1,8 @@
+{% for m in messages %}
+    {% if m['own_message'] %}
+    <span style="color: red;">{{m['message']}}</span><br>
+    {% else %}
+    <span style="color: blue;">{{m['message']}}</span><br>
+    {% endif %}
+    
+{% endfor %}

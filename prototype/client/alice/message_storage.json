@@ -1,0 +1,23 @@
+[
+    {
+        "sender": "321",
+        "recipient": "123",
+        "message": "My ol buddy",
+        "timestamp": "2025-03-29T05:25:51.635564",
+        "own_message": true
+    },
+    {
+        "sender": "My ol pal",
+        "recipient": "123",
+        "message": "",
+        "timestamp": "2025-03-29T05:25:56.467187",
+        "own_message": true
+    },
+    {
+        "sender": "321",
+        "recipient": "123",
+        "message": "My ol pal",
+        "timestamp": "2025-03-29T05:26:01.776667",
+        "own_message": true
+    }
+]
