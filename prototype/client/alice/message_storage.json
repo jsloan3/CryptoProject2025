@@ -1,0 +1,16 @@
+[
+    {
+        "message": "Hi Alice!",
+        "own_message": false,
+        "recipient": "123",
+        "sender": "321",
+        "timestamp": "2025-03-29T20:10:04.570270"
+    },
+    {
+        "sender": "321",
+        "recipient": "123",
+        "message": "Hi Bob!",
+        "timestamp": "2025-03-29T20:11:00.145984",
+        "own_message": true
+    }
+]

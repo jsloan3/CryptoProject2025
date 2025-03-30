@@ -1,0 +1,211 @@
+.mobile-container {
+    width: 375px;
+    height: 667px;
+    margin: auto; 
+    border: 2px solid black;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    flex-direction: column;
+}
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-picture {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: white;
+    overflow: hidden;
+}
+
+.back-bar {
+    height: 50px;
+    width: 100%;
+    background-color: grey;
+}
+
+.back-button {
+    all: unset;
+    padding: 10px;
+    height: 15px;
+    margin: 5px;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    background-color: #e5e5ea;
+    border-radius: 20%;
+}
+
+.back-button:hover {
+    background-color: #a3a3a3;
+    font-weight: bold;
+}
+
+.text-input {
+    width: 78%;
+    margin: 20px auto;
+    resize: none;
+}
+
+.send-text-button {
+    height: 80%;
+    width: 15%;
+    margin: 20px auto;
+}
+
+.send-bar {
+    padding:3px;
+    width: 100%;
+    max-width:500px;
+    height: 50px;
+    background-color: grey;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.phone-num {
+    color: black;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.phone-bar {
+    width: 100%;
+    height: 120px;
+    background-color: grey;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.chat-bubble {
+    max-width: 60%;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin: 5px 10px;
+    text-align: left;
+    display: inline-block;
+}
+
+.contacts-title {
+    width: 100%;
+    height: 50px;
+    background-color: grey;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.chat-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chat-container-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.chat-bubble-left {
+    background-color: #e5e5ea;
+    color: black;
+}
+
+.contact-entry {
+    width: 95%;
+    height: 60px;
+    margin: 10px;
+    padding: 10px;
+    background-color:rgb(175, 175, 175);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    overflow: hidden;
+    border-radius: 5%;
+}
+
+.contact-text {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.profile-picture-contact {
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: white;
+    overflow: hidden;
+}
+
+.setnum-container {
+    background-color: #a3a3a3;
+    display: flex;
+    align-items: center;
+    justify-content:space-evenly;
+    flex-direction: column;
+    width: 70%;
+    height: 30%;
+    border-radius: 10%;
+}
+
+.phone-input {
+    background-color: rgb(206, 206, 206);
+    margin:20px;
+    padding:10px;
+    display: flex;
+    align-items: center;
+    justify-content:space-evenly;
+    flex-direction: column;
+    border-radius:10%;
+}
+
+.ratchat-title {
+    margin: 15px;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.new-contact-button {
+    height:90%;
+    width:35%;
+    font-weight:500;
+}
+
+.new-contact-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 2px;
+    height: 80%;
+}
+
+.new-contact-message {
+    resize: none;
+}
+
+.new-contact-send {
+    width: 50%;
+    height: 20%;
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatChat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        
+        <div class="setnum-container">
+            <div class="ratchat-title">
+                New contact
+            </div>
+            
+            <form action="/add_new_contact/send" method="POST" class="new-contact-form">
+                <div>Phone Number:</div>
+                <input type="text" id="phone_num" name="phone_num">
+                <div>Greeting Message:</div>
+                <textarea name="contact_message" class="new-contact-message"></textarea>
+                <button class="new-contact-send">Add</button>
+            </form>
+            
+            
+        </div>
+    </div>
+</body>
+</html>
+
+

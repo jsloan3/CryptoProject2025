@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatChat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="contacts-title">
+            <div>
+                Contacts
+            </div>
+        </div>
+        <div class="message-container">
+
+            {% for c in contacts %}
+                <button class="contact-entry" onclick="window.location.href='/messages/{{ c }}'">
+                    <div class="profile-picture-contact">
+                        <img src="https://api.dicebear.com/9.x/personas/svg?seed={{ c }}">
+                    </div>
+                    <div class="contact-text">
+                        {{ c }}
+                    </div>
+                    <div>
+                        <!-- empty padding -->
+                    </div>
+                </button>
+            {% endfor %}
+            
+        </div>
+        <div class="send-bar">
+            <button class="new-contact-button" onclick="window.location.href='/add_new_contact'">Add New Contact</button>
+        </div>
+    </div>
+    
+</body>
+</html>
