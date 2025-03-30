@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatChat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        
+        <div class="setnum-container">
+            <div class="ratchat-title">
+                RatChat
+            </div>
+            <div>
+                Thank you for using RatChat!
+            </div>
+            <div>
+            </div>
+            <div class="phone-input">
+                Your Phone Number:
+                <div style="padding:2px;"></div>
+                <form action="/set_phone_num" method="POST">
+                    <input type="text" id="phone_num" name="phone_num">
+                    <button>Sign up</button>
+                </form>
+                
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
+
+

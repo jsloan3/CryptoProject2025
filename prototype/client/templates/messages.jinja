@@ -1,8 +1,52 @@
-{% for m in messages %}
-    {% if m['own_message'] %}
-    <span style="color: red;">{{m['message']}}</span><br>
-    {% else %}
-    <span style="color: blue;">{{m['message']}}</span><br>
-    {% endif %}
-    
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF=8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatChat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="back-bar">
+            <button class="back-button" onclick="window.location.href='/contacts'">
+                < Back
+            </button>
+        </div>
+        <div class="phone-bar">
+            <div class="profile-picture">
+                <img src="https://api.dicebear.com/9.x/personas/svg?seed={{ recipient }}">
+            </div>
+            <div class="phone-num">
+                {{ recipient }}
+            </div>
+            
+        </div>
+        <div class="message-container">
+            {% for m in messages %}
+            {% if m['own_message'] %}
+            <div class="chat-container">
+                <div class="chat-bubble">
+                    {{m['message']}}
+                </div>
+            </div>
+            {% else %}
+            <div class="chat-container-left">
+                <div class="chat-bubble chat-bubble-left">
+                    {{m['message']}}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <form class="send-bar" action="/sendmessage" method="POST" >
+            <textarea class="text-input" id="textInput" name="textInput" placeholder="Text Message"></textarea>
+            <input type="hidden", name="to_send_to", id="to_send_to" value="{{recipient}}">
+            <button class="send-text-button" id="sendbutton" name="sendbutton">SEND</button>
+        </form>
+    </div>
+</body>
+</html>
+
+

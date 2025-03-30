@@ -1,30 +1,16 @@
 [
     {
-        "message": "My ol buddy",
+        "sender": "123",
+        "recipient": "321",
+        "message": "Hi Alice!",
+        "timestamp": "2025-03-29T20:10:04.570270",
+        "own_message": true
+    },
+    {
+        "message": "Hi Bob!",
         "own_message": false,
         "recipient": "321",
         "sender": "123",
-        "timestamp": "2025-03-29T05:25:51.635564"
-    },
-    {
-        "message": "hello buddy",
-        "own_message": true,
-        "recipient": "321",
-        "sender": "123",
-        "timestamp": "2025-03-29T05:25:51.635564"
-    },
-    {
-        "message": "how are you",
-        "own_message": true,
-        "recipient": "321",
-        "sender": "123",
-        "timestamp": "2025-03-29T05:25:51.635564"
-    },
-    {
-        "message": "My ol pal",
-        "own_message": false,
-        "recipient": "321",
-        "sender": "123",
-        "timestamp": "2025-03-29T05:26:01.776667"
+        "timestamp": "2025-03-29T20:11:00.145984"
     }
 ]

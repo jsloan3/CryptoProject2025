@@ -2,6 +2,7 @@ import datetime
 import json
 import requests, time, sys
 from flask import Flask, redirect, render_template, request
+import argparse
 
 SERVER_HOST = 'http://127.0.0.1:8000'
 USER_DATA_FILE = 'user_data.json'
@@ -10,23 +11,64 @@ my_phonenum = None
 
 app = Flask(__name__)
 
-@app.route('/messages/<phonenum>', methods=['GET'])
+@app.route('/messages/<phonenum>', methods=['GET', 'POST'])
 def messages(phonenum):
+    if not my_phonenum:
+        return redirect('/')
     check_messages(my_phonenum)
     messages = get_phone_messages(phonenum)
     return render_template('messages.jinja', messages=messages, recipient=phonenum)
 
 @app.route('/sendmessage', methods=['POST'])
 def sendmessage():
-    data = request.get_json()
-    message = data['message']
-    send_to = data['recipient']
-    send_message(send_to, message)
+    recipient = request.form.get('to_send_to')
+    message = request.form.get('textInput')
+    print(recipient, message)
+    send_message(recipient, message)
+    return redirect(f'/messages/{recipient}')
 
-    return redirect(f'/messages/{send_to}')
+@app.route('/contacts', methods=['GET'])
+def contacts():
+    if not my_phonenum:
+        return redirect('/')
+    check_messages(my_phonenum)
+    messages = load_saved_messages()
+    contacts = get_users_from_messages(messages)
+    return render_template('contacts.jinja', contacts=contacts)
+
+@app.route('/set_number', methods=['GET'])
+def set_number():
+    return render_template('set_number.jinja')
+
+@app.route('/set_phone_num', methods=['POST'])
+def set_phone_num():
+    global my_phonenum
+    res = request.form.get('phone_num')
+    my_phonenum = res
+
+    save_user_data()
+    return redirect('/')
+
+@app.route('/add_new_contact', methods=['GET'])
+def add_new_contact():
+
+    return render_template('add_new_contact.jinja')
+
+@app.route('/add_new_contact/send', methods=['POST'])
+def send_new_contact():
+    recipient = request.form.get('phone_num')
+    message = request.form.get('contact_message')
+    send_message(recipient, message)
+    return redirect(f'/contacts')
 
 
-
+@app.route('/', methods=['GET'])
+def index():
+    load_user_data()
+    if not my_phonenum:
+        return redirect('/set_number')
+    else:
+        return redirect('/contacts')
 
 
 def check_messages(phonenum):
@@ -155,8 +197,19 @@ def get_phone_messages(phonenum):
             to_return += [m]
     return to_return
     
+def get_users_from_messages(messages):
+    if not messages:
+        return []
+    contacts = []
+    for m in messages:
+        if m['sender'] not in contacts:
+            contacts.append(m['sender'])
+    return contacts
 
 
 if __name__ == "__main__":
-    app.run(host = '0.0.0.0', port=8050, debug=True, threaded=False)
+    parser = argparse.ArgumentParser(description="ratchat")
+    parser.add_argument('--port', type=int, default=8050)
+    args = parser.parse_args()
+    app.run(host = '0.0.0.0', port=args.port, debug=True, threaded=False)
     #main()
