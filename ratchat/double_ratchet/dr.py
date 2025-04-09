@@ -92,7 +92,7 @@ class DoubleRatchet:
         if self.dh_ratchet_sent:
             header = {"dh": None, "pn": None, "n": self.Ns}
         else:
-            dh_bytes = self.dh_pair.public_key().public_bytes_raw()
+            dh_bytes = self.dh_pair.public_key().public_bytes_raw().hex()
             header = {"dh": dh_bytes, "pn": self.PN, "n": self.Ns}
             self.dh_ratchet_sent = True
 
@@ -101,8 +101,8 @@ class DoubleRatchet:
         self.Ns += 1
 
         aesgcm = AESGCM(message_key)
-        nonce = os.urandom(12)  # 96-bit nonce for AES-GCM
-        ciphertext = aesgcm.encrypt(nonce, plaintext.encode(), None)
+        nonce = os.urandom(12).hex()  # 96-bit nonce for AES-GCM
+        ciphertext = aesgcm.encrypt(bytes.fromhex(nonce), plaintext.encode(), None).hex()
 
         return {"header": header, "nonce": nonce, "ciphertext": ciphertext}
 
@@ -114,9 +114,9 @@ class DoubleRatchet:
         header = message["header"]
         if header["dh"] is not None:
             received_dh = header["dh"]
-            if received_dh != self.remote_dh_public_bytes:
+            if bytes.fromhex(received_dh) != self.remote_dh_public_bytes:
                 new_remote_dh_public = x25519.X25519PublicKey.from_public_bytes(
-                    received_dh
+                    bytes.fromhex(received_dh)
                 )
                 self.dh_ratchet_update(new_remote_dh_public)
 
@@ -129,7 +129,7 @@ class DoubleRatchet:
         self.Nr += 1
 
         aesgcm = AESGCM(message_key)
-        plaintext = aesgcm.decrypt(message["nonce"], message["ciphertext"], None)
+        plaintext = aesgcm.decrypt(bytes.fromhex(message["nonce"]), bytes.fromhex(message["ciphertext"]), None)
         return plaintext.decode()
 
 
