@@ -1,4 +1,4 @@
-import requests, time, sys, random, uuid, os, json, datetime, argparse
+import requests, sys, uuid, os, json, datetime, argparse
 from flask import Flask, redirect, render_template, request
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import double_ratchet.dr
@@ -11,9 +11,10 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 SERVER_HOST = 'http://127.0.0.1:8000'
 USER_DATA_FILE = 'user_data.json'
 MESSAGE_STORAGE = 'message_storage.json'
+PREKEY_STORAGE = 'prekey_storage.json'
+RATCHET_STORAGE = 'ratchet_storage.json'
 
 global_pre_keys = []
-
 global_ratchets = []
 
 my_phonenum = None
@@ -58,11 +59,11 @@ def set_phone_num():
     save_user_data()
 
     make_prekeys(5)
+    save_prekeys()
     return redirect('/')
 
 @app.route('/add_new_contact', methods=['GET'])
 def add_new_contact():
-
     return render_template('add_new_contact.jinja')
 
 @app.route('/add_new_contact/send', methods=['POST'])
@@ -70,6 +71,7 @@ def send_new_contact():
     recipient = request.form.get('phone_num')
     message = request.form.get('contact_message')
     prekey_id, my_pubkey = make_new_ratchet_as_sender(recipient)
+    save_ratchets()
     send_message(recipient, message)
     return redirect(f'/contacts')
 
@@ -81,6 +83,24 @@ def index():
         return redirect('/set_number')
     else:
         return redirect('/contacts')
+
+def save_prekeys():
+    with open(PREKEY_STORAGE, 'w') as f:
+        f.write(json.dumps(global_pre_keys))
+
+def load_prekeys():
+    global global_pre_keys
+    with open(PREKEY_STORAGE, 'r') as f:
+        global_pre_keys = json.loads(f.read())
+
+def save_ratchets():
+    with open(RATCHET_STORAGE, 'w') as f:
+        f.write(json.dumps(global_ratchets, cls=double_ratchet.dr.DoubleRatchetEncoder))
+
+def load_ratchets():
+    global global_ratchets
+    with open(RATCHET_STORAGE, 'r') as f:
+        global_ratchets = json.loads(f.read(), object_hook=double_ratchet.dr.double_ratchet_decoder)
 
 def make_new_ratchet_as_sender(receiver : str):
     global global_ratchets
@@ -148,6 +168,7 @@ def make_prekeys(n : int):
     print(global_pre_keys)
 
 def check_messages(phonenum):
+    load_prekeys()
     try:
         res = requests.get(f"{SERVER_HOST}/receive/{phonenum}")
         res.raise_for_status()
@@ -171,6 +192,7 @@ def check_messages(phonenum):
             else:
                 sender_ratchet = sender_ratchet['ratchet']
             decmessage = sender_ratchet.decrypt_message(m['message'])
+            save_ratchets()
             m['message'] = decmessage
 
         save_messages(messages)
@@ -179,10 +201,12 @@ def check_messages(phonenum):
     
 
 def send_message(phonenum, message):
+    load_ratchets()
     timestamp = datetime.datetime.now().isoformat()
     ratchet = check_for_ratchet(phonenum)
     dratchet: double_ratchet.dr.DoubleRatchet = ratchet['ratchet']
     ciphertext = dratchet.encrypt_message(message)
+    save_ratchets()
     print(ciphertext)
     to_send = {
         'sender': my_phonenum,
