@@ -1,4 +1,4 @@
-import requests, time, sys, random, uuid, os, json, datetime, argparse
+import requests, sys, uuid, os, json, datetime, argparse
 from flask import Flask, redirect, render_template, request
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import double_ratchet.dr

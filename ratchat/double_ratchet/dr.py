@@ -1,9 +1,5 @@
 from dataclasses import dataclass, field
-import json
-import os
-import hmac
-import hashlib
-import base64
+import json, os, hmac, hashlib, base64
 from pprint import pformat
 
 from cryptography.hazmat.backends import default_backend
