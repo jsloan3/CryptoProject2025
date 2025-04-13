@@ -164,6 +164,7 @@ class DoubleRatchet:
         message_key, self.receiving_chain_key = kdf_chain(self.receiving_chain_key)
         self.Nr += 1
 
+        print(f"DECRYPTING:\n   ciphertext: {message["ciphertext"]}\n   key: {message_key.hex()}\n    nonce: {message["nonce"]}")
         aesgcm = AESGCM(message_key)
         plaintext = aesgcm.decrypt(bytes.fromhex(message["nonce"]), bytes.fromhex(message["ciphertext"]), None)
         return plaintext.decode()
